@@ -96,7 +96,22 @@ function checked(v){return yesNo(v)===true}
 function pickList(row,pairs){return pairs.filter(([key])=>checked(row[key])).map(([,label])=>label)}
 function areaName(v){return cleanText(v).replace(/_(?:llc|llcity)$/i,'').replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}
 function numeric(v){if(v==null||String(v).trim()==='')return null;const n=Number(v);return Number.isFinite(n)?n:null}
-function pointFor(latValue,lonValue,id){const lat=numeric(latValue),lon=numeric(lonValue);if(lat==null||lon==null||Math.abs(lat)>90||Math.abs(lon)>180)return null;let seed=(id*2654435761)>>>0;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};const jitter=()=>((random()-.5)*.008);return [Number((Math.round(lat*100)/100+jitter()).toFixed(6)),Number((Math.round(lon*100)/100+jitter()).toFixed(6))]}
+
+function pointFor(latValue, lonValue, id) {
+  const lat = numeric(latValue);
+  const lon = numeric(lonValue);
+
+  if (
+    lat === null || lon === null ||
+    Math.abs(lat) > 90 ||
+    Math.abs(lon) > 180
+  ) {
+    return null;
+  }
+
+  return [lat, lon];
+}
+
 const disabilityHeaders=['Type/s of Disability:/Physical/Mobility disability','Type/s of Disability:/Visual ','Type/s of Disability:/Hearing','Type/s of Disability:/Speech/Communication','Type/s of Disability:/Intellectual/Developmental','Type/s of Disability:/Psychosocial','Type/s of Disability:/Learning','Type/s of Disability:/Chronic Illness'];
 function personSenior(row){const flag=yesNo(row['Profile or sector:/Senior citizen']),age=cleanText(row.Age).toLowerCase();return flag===true||age.includes('60 years old and older')?true:flag===false||age?false:null}
 function personPwd(row){const flag=yesNo(row['Profile or sector:/Person with Disability (PWD)']),types=disabilityHeaders.map(k=>yesNo(row[k]));if(flag===true||types.includes(true))return true;if(flag===false||types.every(x=>x===false))return false;return null}
