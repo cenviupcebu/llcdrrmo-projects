@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Lapu-Lapu City DRR-CCA Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+<style>
+:root{--ink:#173448;--muted:#5d7481;--line:#d8e3e1;--paper:#f2f6f4;--surface:#fff;--teal:#147c77;--coral:#c9564e;--gold:#c28b35;--purple:#7562a7;--blue:#477b99;--green:#398264;--shadow:0 12px 32px rgba(23,52,72,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif}main{width:min(1520px,calc(100% - 36px));margin:22px auto 44px}
+.hero{position:relative;overflow:hidden;padding:25px 29px;border-radius:19px;background:#153a50;color:#f8fbfa;box-shadow:var(--shadow)}.hero:after{content:"";position:absolute;width:310px;height:310px;right:-100px;top:-183px;border:1px solid #ffffff2a;border-radius:50%;box-shadow:0 0 0 34px #ffffff08,0 0 0 72px #ffffff06}.kicker{margin:0 0 7px;color:#a7d9ce;font-size:11px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}h1{margin:0;font-size:clamp(26px,3.2vw,38px);line-height:1.1;letter-spacing:-.035em;font-weight:680}.hero p:last-of-type{margin:9px 0 0;color:#d4e2e5}.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}.pill{padding:5px 10px;border:1px solid #ffffff35;border-radius:99px;color:#f4faf9;font-size:11px}.pill.restricted{color:#ffe5c1;border-color:#edb76f}
+.filters{margin-top:14px;padding:15px 18px;border:1px solid var(--line);border-radius:15px;background:var(--surface);box-shadow:var(--shadow)}.filter-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}.filter-head h2,.section-title{margin:0;font-size:14px;letter-spacing:-.01em}.filter-actions{display:flex;gap:7px}.button{border:1px solid #bfd1ce;border-radius:8px;background:white;padding:7px 10px;color:var(--ink);font:600 11px "Segoe UI",system-ui,sans-serif;cursor:pointer}.button:hover{background:#edf6f3}.button.primary{background:var(--teal);border-color:var(--teal);color:white}.button.quiet{color:var(--muted);background:#f8faf9}.button:disabled{opacity:.45;cursor:not-allowed}.filter-row{display:flex;align-items:flex-start;gap:17px;flex-wrap:wrap}.area-list{display:flex;flex:1;flex-wrap:wrap;gap:7px}.area-option{display:flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid var(--line);border-radius:9px;background:#fbfcfc;color:#244355;font-size:12px;cursor:pointer}.area-option:has(input:checked){border-color:#8ebcb5;background:#e7f4f1}.area-option input{accent-color:var(--teal)}.area-count{color:var(--muted);font-size:10px}.age-filter{display:grid;gap:4px;min-width:190px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}.age-filter select{width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink);font:12px "Segoe UI",system-ui,sans-serif;text-transform:none;letter-spacing:0}.filter-note{margin:10px 0 0;color:var(--muted);font-size:11px}
+.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:13px}.metric{padding:12px 14px;border:1px solid var(--line);border-radius:13px;background:white;min-width:0}.metric-label{color:var(--muted);font-size:10px;font-weight:720;letter-spacing:.045em;text-transform:uppercase}.metric-value{margin-top:4px;font-size:23px;font-weight:720;line-height:1.1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.metric-note{margin-top:4px;color:var(--muted);font-size:10px}
+.explorer{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(380px,.95fr);gap:13px;align-items:start;margin-top:14px}.map-panel,.chart-panel,.table-panel{min-width:0;border:1px solid var(--line);border-radius:15px;background:var(--surface);box-shadow:var(--shadow)}.map-panel{padding:15px;display:flex;flex-direction:column}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.panel-head h2{margin:0;font-size:16px;letter-spacing:-.02em}.panel-head p{margin:4px 0 0;color:var(--muted);font-size:11px}.map-controls{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}.map-canvas{width:100%;height:clamp(520px,66vh,760px);margin-top:11px;overflow:hidden;border:1px solid #d8e3df;border-radius:11px;background:#e8f0ed}.map-loading{display:grid;place-items:center;height:100%;padding:20px;color:var(--muted);text-align:center}.map-status{display:flex;justify-content:space-between;gap:12px;margin:9px 2px 0;color:var(--muted);font-size:11px}.map-status strong{color:var(--ink)}.map-note{margin:9px 2px 0;padding:9px 11px;border-left:3px solid var(--gold);border-radius:0 7px 7px 0;background:#fcf8ef;color:#536b76;font-size:10px}
+.chart-panel{overflow:hidden;display:flex;flex-direction:column;height:calc(clamp(520px,66vh,760px) + 31px);max-height:calc(clamp(520px,66vh,760px) + 31px)}.chart-panel-head{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:9px;padding:15px 16px 11px;border-bottom:1px solid var(--line);background:#fff}.chart-panel-head h2{margin:0;font-size:16px}.chart-panel-head p{margin:4px 0 0;color:var(--muted);font-size:10px}.chart-size-controls{display:flex;align-items:center;flex-wrap:wrap;gap:5px}.chart-size-label{margin-right:2px;color:var(--muted);font-size:9px;font-weight:700}.chart-size-controls .button{padding:5px 7px;font-size:9px}.chart-size-controls .button[aria-pressed=true]{background:#e4f2ee;border-color:#82b2a8;color:#145c54}.chart-rail{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:11px 12px 16px;scrollbar-color:#9fbab5 #edf2f0;scrollbar-width:thin}.explorer.chart-wide{grid-template-columns:minmax(0,1.05fr) minmax(460px,1.25fr)}.explorer.chart-short .chart-panel{height:clamp(400px,50vh,590px);max-height:72vh}.explorer.chart-tall .chart-panel{height:min(90vh,1000px);max-height:92vh}.chart-group{margin:0 0 14px}.group-heading{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:7px 3px 8px}.group-heading h3{margin:0;font-size:12px;color:#315266}.group-heading span{color:var(--muted);font-size:9px}.chart-card{margin:0 0 9px;padding:12px 12px 10px;border:1px solid #e1e9e7;border-radius:11px;background:#fff}.chart-title{margin:0;font-size:12px;font-weight:700}.chart-sub{margin:3px 0 9px;color:var(--muted);font-size:9px}.chart-bars{display:grid;gap:7px}.chart-bar{display:grid;width:100%;grid-template-columns:minmax(110px,1.2fr) minmax(70px,1fr) 68px;align-items:center;gap:8px;padding:0;border:0;background:transparent;color:var(--ink);text-align:left;cursor:pointer}.chart-bar:hover .bar-label{text-decoration:underline;text-decoration-color:#8bb9b1}.chart-bar.is-active .bar-label{color:var(--teal);font-weight:750}.bar-label{font-size:10px;line-height:1.2}.bar-track{height:8px;overflow:hidden;border-radius:99px;background:#ecf1ef}.bar-fill{display:block;height:100%;min-width:2px;border-radius:99px;background:var(--teal);transition:width .22s ease}.chart-card.warm .bar-fill{background:var(--coral)}.chart-card.gold .bar-fill{background:var(--gold)}.chart-card.purple .bar-fill{background:var(--purple)}.chart-card.blue .bar-fill{background:var(--blue)}.chart-card.green .bar-fill{background:var(--green)}.bar-stat{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.bar-stat strong{font-size:10px}.bar-stat small{display:block;color:var(--muted);font-size:8px}.chart-empty{padding:10px;color:var(--muted);font-size:10px}.chart-foot{margin:8px 0 0;color:var(--muted);font-size:9px}
+.heatmap{display:grid;grid-template-columns:minmax(73px,1fr) repeat(5,minmax(44px,.85fr));gap:4px;align-items:stretch}.heat-head{display:grid;place-items:end center;min-height:32px;color:var(--muted);font-size:8px;text-align:center;line-height:1.05}.heat-area{display:flex;align-items:center;color:#244355;font-size:9px;font-weight:700}.heat-cell{min-height:41px;padding:4px 2px;border:1px solid #fff;border-radius:6px;color:var(--ink);cursor:pointer;text-align:center;font:inherit}.heat-cell:hover,.heat-cell.is-active{outline:2px solid var(--ink);outline-offset:1px}.heat-cell strong{display:block;font-size:10px}.heat-cell small{font-size:8px}
+.upset-wrap{width:100%;overflow-x:auto;overflow-y:hidden;padding:2px 0 5px;scrollbar-color:#9fbab5 #edf2f0;scrollbar-width:thin}.upset-wrap svg{display:block;max-width:none}.upset-axis{fill:#5d7481;font-size:10px}.upset-count{fill:#3e5663;font-size:9px;font-weight:700}.upset-row-label{fill:#294654;font-size:9px}.upset-wrap [data-key],.polar-wrap [data-key]{cursor:pointer}.upset-wrap [data-key]:focus,.polar-wrap [data-key]:focus{outline:none}.upset-wrap [data-key]:focus rect,.upset-wrap [data-key]:focus circle,.upset-wrap [data-key]:focus line{filter:drop-shadow(0 0 2px #173448)}.polar-wrap{width:100%;overflow:hidden}.polar-wrap svg{display:block;width:100%;height:auto;max-height:390px}.polar-label{fill:#344f5d;font-size:8px;font-weight:650}.polar-ring{fill:#71858e;font-size:8px}.polar-sector:focus path{stroke:#173448;stroke-width:2}.polar-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:5px;color:#405a66;font-size:9px}.polar-legend span{display:inline-flex;align-items:center;gap:5px}.legend-dot{display:inline-block;width:10px;height:10px}.legend-dot.disaster{background:#e84b3c}.legend-dot.equipment{background:#2fc477}
+.selection-banner{display:none;margin:0 0 10px;padding:9px 11px;border:1px solid #9ecac1;border-radius:9px;background:#e9f5f1;color:#24574f;font-size:10px}.selection-banner.show{display:block}.table-panel{margin-top:14px;padding:15px}.table-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}.table-head h2{margin:0;font-size:17px}.table-head p{margin:4px 0 0;color:var(--muted);font-size:10px}.table-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px}.table-count{color:var(--muted);font-size:10px;white-space:nowrap}.internal-toggle{display:inline-flex;align-items:center;gap:5px;color:#81542b;font-size:9px;font-weight:700;white-space:nowrap}.internal-toggle input{accent-color:#a56d2f}.internal-note{margin:0 0 8px;color:#81542b;font-size:9px}.pager{display:flex;gap:6px}.table-wrap{width:100%;overflow:auto;border:1px solid var(--line);border-radius:10px}table{width:100%;min-width:1180px;border-collapse:collapse;background:white}thead th{position:sticky;top:0;padding:9px 8px;background:#edf4f1;color:#395664;font-size:9px;font-weight:750;text-align:left;text-transform:uppercase;letter-spacing:.045em;white-space:nowrap}tbody td{padding:8px;border-top:1px solid #e8eeec;vertical-align:top;color:#294654;font-size:10px;line-height:1.35}tbody tr{cursor:pointer}tbody tr:hover{background:#f5faf8}tbody tr.is-selected{background:#e4f2ee;box-shadow:inset 3px 0 var(--teal)}.record-id{color:var(--teal);font-weight:750;white-space:nowrap}.table-empty{text-align:center;color:var(--muted);padding:20px}.footer{margin:14px 3px 0;color:var(--muted);font-size:10px}.footer details{padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:#fff}.footer summary{color:#315266;font-weight:700;cursor:pointer}.footer p{margin:8px 0 0;line-height:1.5}.badge{display:inline-block;margin:1px 2px;padding:2px 5px;border-radius:5px;background:#f8e8e5;color:#994b43;font-size:9px}
+.leaflet-container{font:11px/1.4 "Segoe UI",system-ui,sans-serif}.leaflet-control-attribution{font-size:9px!important}.marker-cluster-small,.marker-cluster-medium,.marker-cluster-large{background:rgba(20,124,119,.23)}.marker-cluster-small div,.marker-cluster-medium div,.marker-cluster-large div{background:#147c77;color:white;font-weight:700}.house-dot{background:#147c77;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 6px #17344870}.house-dot.filtered{background:#c9564e}.house-dot.selected{background:#173448}.leaflet-popup-content{margin:10px 12px;font-size:11px}
+.data-source{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;padding:12px 16px;border:1px solid var(--line);border-radius:13px;background:#fff;box-shadow:var(--shadow)}.data-source h2{margin:0;font-size:13px}.data-source p{margin:3px 0 0;color:var(--muted);font-size:10px}.file-picker{position:relative;display:inline-flex;align-items:center;overflow:hidden}.file-picker input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.file-status{flex:1;min-width:180px;color:var(--muted);font-size:10px}.file-status.error{color:#a3453d;font-weight:700}.explorer{grid-template-columns:minmax(0,1fr) minmax(320px,var(--chart-width,42%))}.chart-panel{height:var(--chart-height,700px);max-height:92vh}.chart-size-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.chart-size-controls label{display:grid;grid-template-columns:auto minmax(75px,110px) 42px;align-items:center;gap:5px;color:var(--muted);font-size:9px;font-weight:700}.chart-size-controls input[type=range]{width:100%;accent-color:var(--teal)}.chart-size-controls output{color:var(--ink);font-size:9px;font-variant-numeric:tabular-nums;text-align:right}.chart-size-controls .button{padding:5px 7px;font-size:9px}.explorer.chart-short .chart-panel,.explorer.chart-tall .chart-panel,.explorer.chart-wide{height:var(--chart-height,700px);max-height:92vh;grid-template-columns:minmax(0,1fr) minmax(320px,var(--chart-width,42%))}.data-source{scroll-margin-top:10px}
+@media(max-width:800px){.explorer,.explorer.chart-wide{grid-template-columns:1fr}.chart-panel,.explorer.chart-short .chart-panel,.explorer.chart-tall .chart-panel{height:min(var(--chart-height,700px),88vh);max-height:88vh}.chart-size-controls label#chart-width-control{display:none}.file-status{flex-basis:100%}}
+@media(max-width:1050px){.explorer{grid-template-columns:minmax(0,1.15fr) minmax(330px,.9fr)}.metric-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:800px){main{width:calc(100% - 20px);margin:10px auto 28px}.hero{padding:21px 19px}.filters{padding:13px}.explorer,.explorer.chart-wide{grid-template-columns:1fr}.map-canvas{height:55vh;min-height:390px}.chart-panel{height:70vh;max-height:80vh;min-height:500px}.explorer.chart-short .chart-panel{height:52vh;max-height:62vh;min-height:380px}.explorer.chart-tall .chart-panel{height:88vh;max-height:92vh;min-height:520px}.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.filter-head{align-items:flex-start}.filter-row{gap:12px}.map-status{display:block}.map-status span{display:block;margin:2px 0}.table-head{display:block}.table-actions{margin-top:9px;justify-content:space-between}}
+@media(max-width:480px){.hero-meta{gap:5px}.pill{font-size:9px}.filter-head{display:block}.filter-actions{margin-top:8px}.age-filter{flex:1;min-width:160px}.area-option{font-size:11px}.metric-grid{gap:7px}.metric{padding:10px}.metric-value{font-size:20px}.map-panel{padding:11px}.panel-head{display:block}.map-controls{justify-content:flex-start;margin-top:8px}.map-canvas{height:52vh;min-height:350px}.chart-bar{grid-template-columns:minmax(100px,1.1fr) minmax(48px,1fr) 58px;gap:6px}.heatmap{grid-template-columns:minmax(60px,1fr) repeat(5,minmax(37px,.85fr));gap:2px}.heat-head{font-size:7px}.heat-area{font-size:8px}.heat-cell{min-height:38px}.table-panel{padding:11px}.table-count{white-space:normal}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+/* Keep slider sizing in control after the breakpoint defaults above. */
+.explorer{grid-template-columns:minmax(0,1fr) minmax(320px,var(--chart-width,42%))}.chart-panel{height:var(--chart-height,700px);max-height:92vh;min-height:0}.explorer.chart-short .chart-panel,.explorer.chart-tall .chart-panel{height:var(--chart-height,700px);max-height:92vh;min-height:0}
+.basemap-control{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:10px;font-weight:700}.basemap-control select{max-width:170px;padding:6px 8px;border:1px solid #bfd1ce;border-radius:8px;background:#fff;color:var(--ink);font:11px "Segoe UI",system-ui,sans-serif}
+@media(max-width:1050px) and (min-width:801px){.explorer{grid-template-columns:minmax(0,1fr) minmax(320px,var(--chart-width,42%))}}
+@media(max-width:800px){.explorer,.explorer.chart-wide{grid-template-columns:1fr}.chart-panel,.explorer.chart-short .chart-panel,.explorer.chart-tall .chart-panel{height:min(var(--chart-height,700px),88vh);max-height:88vh;min-height:0}.chart-size-controls label#chart-width-control{display:none}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+  <p class="kicker">Lapu-Lapu City DRRMO · UP Cebu CENVI</p>
+  <h1>DRR-CCA Household Baselining</h1>
+  <p>Explore household-reported conditions, preparedness gaps, and disaster information channels.</p>
+  <div class="hero-meta"><span class="pill" id="dataset-count">No workbook selected</span><span class="pill">Interactive map · chart-to-map filters</span><span class="pill restricted">Internal DRR view · local workbook data</span></div>
+</header>
+<section class="data-source" aria-label="Dashboard data source"><div><h2>Load a household master list</h2><p>Select the Excel workbook to generate its charts, map, and table. The file is read in this browser session.</p></div><label class="button primary file-picker">Choose Excel workbook<input type="file" id="workbook-file" accept=".xlsx,.xls" aria-label="Choose household master list workbook"></label><span class="file-status" id="file-status" role="status" aria-live="polite">Choose the Master List workbook to begin.</span></section>
+<section class="filters" aria-label="Dashboard filters">
+  <div class="filter-head"><h2>Filter by submission area</h2><div class="filter-actions"><button type="button" class="button" id="select-all">Select all</button><button type="button" class="button quiet" id="clear-areas">Clear</button><button type="button" class="button quiet" id="reset-filters">Reset filters</button></div></div>
+  <div class="filter-row"><div class="area-list" id="area-options"></div><label class="age-filter">Household head age group<select id="age-filter"><option value="All">All age groups</option></select></label></div>
+</section>
+<section class="metric-grid" id="metrics" aria-label="Current area summary"></section>
+<section class="explorer" id="explorer" aria-label="Interactive household map and charts">
+  <article class="map-panel">
+    <div class="panel-head"><div><h2>Where are the household needs?</h2><p>Approximate survey points. Click one point to select its household row below.</p></div><div class="map-controls"><label class="basemap-control">Basemap<select id="basemap-select" aria-label="Choose map basemap"><option value="streets">Streets</option><option value="satellite">Satellite imagery</option><option value="topographic">Topographic</option><option value="light">Light gray</option></select></label><button type="button" class="button quiet" id="clear-selection">Clear chart / point selection</button></div></div>
+    <div id="map" class="map-canvas" role="application" aria-label="Map of approximate household survey points"><div class="map-loading">Loading map…</div></div>
+    <div class="map-status" aria-live="polite"><span id="map-count"></span><span id="map-filter-label"></span></div>
+    <p class="map-note">A chart click narrows the map and table to matching households. Individual points use synthetic positions within rounded coordinate cells, not exact household coordinates. Cluster bubbles group nearby points; click a cluster to zoom in.</p>
+  </article>
+  <aside class="chart-panel" aria-label="Scrollable charts and intervention drill-down">
+    <div class="chart-panel-head"><div><h2>Charts and drill-down</h2><p>Scroll this panel. Click any bar or comparison cell to filter the map and table.</p></div><div class="chart-size-controls" role="group" aria-label="Adjust chart panel size"><label>Height<input id="chart-height-slider" type="range" min="460" max="1000" step="20" value="700" aria-label="Chart panel height"><output id="chart-height-value" for="chart-height-slider">700 px</output></label><label id="chart-width-control">Width<input id="chart-width-slider" type="range" min="28" max="65" step="1" value="42" aria-label="Chart panel width"><output id="chart-width-value" for="chart-width-slider">42%</output></label></div></div>
+    <div class="chart-rail" id="chart-rail"><div id="chart-content"></div></div>
+  </aside>
+</section>
+<section class="table-panel" aria-label="Filtered household records">
+  <div class="selection-banner" id="selection-banner" aria-live="polite"></div>
+  <div class="table-head"><div><h2>Household drill-down table</h2><p>Five rows per page. Click a row to focus its approximate map point; click a map point to show only that household here.</p></div><div class="table-actions"><span class="table-count" id="table-count"></span><label class="internal-toggle"><input type="checkbox" id="show-head-contact"> Show head name and contact</label><div class="pager"><button type="button" class="button" id="prev-page">Previous</button><button type="button" class="button" id="next-page">Next</button></div></div></div>
+   <p class="internal-note">Internal details are hidden until selected. Household names and contact numbers are read from your selected workbook in this browser and are not saved into this HTML file.</p>
+  <div class="table-wrap"><table><thead><tr><th>Record</th><th data-private-column hidden>Household-head name</th><th data-private-column hidden>Contact number</th><th>Area proxy</th><th>Head profile</th><th>Monthly income</th><th>Household size</th><th>Older adult / PWD</th><th>Preparedness gaps</th><th>Walls and roof</th><th>Disaster experience</th><th>Information channels</th></tr></thead><tbody id="table-body"></tbody></table></div>
+</section>
+<footer class="footer"><details><summary>Data notes, definitions, and privacy</summary><p id="data-notes"></p><p>Area comparisons use submission tags, not verified barangay boundaries. Confirm assignments before official geographic claims. Gap indicators overlap and should not be summed. Multi-select percentages may exceed 100%; missing single-answer values are excluded from that chart denominator.</p></details></footer>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+let D=[],allAreaCounts=new Map(),areas=[],ages=[];
+const fmt=n=>new Intl.NumberFormat('en-US').format(n||0);
+const pct=(n,d)=>d?(n/d*100).toFixed(1)+'%':'—';
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rowName=r=>'H-'+String(r.id).padStart(4,'0');
+const gapDefs=[
+ {key:'warning',label:'No community early-warning system',short:'No warning'},
+ {key:'training',label:'No emergency preparedness training',short:'No training'},
+ {key:'noEquipment',label:'No emergency equipment listed',short:'No equipment'},
+ {key:'hotline',label:'Does not know local emergency hotline',short:'Hotline not known'},
+ {key:'evacCenter',label:'Does not know nearest evacuation center',short:'Evacuation center not known'}
+];
+let selectedAreas=new Set(areas),ageFilter='All',activeFilter=null,mapSelected=null,highlighted=null,page=0,showHeadContact=false;
+let map=null,clusters=null,markerById=new Map(),basemapLayer=null,firstView=true;
+function cleanText(v){return v==null?'':String(v).replace(/\ufffd/g,'').trim()}
+function valueOrNull(v){if(v==null||String(v).trim()==='')return null;return typeof v==='string'?v.trim():v}
+function yesNo(v){if(v===true||v===1||v==='1')return true;if(v===false||v===0||v==='0')return false;if(v==null)return null;const s=String(v).trim().toLowerCase();if(['yes','y','true','checked','selected'].includes(s))return true;if(['no','n','false','unchecked'].includes(s))return false;return null}
+function checked(v){return yesNo(v)===true}
+function pickList(row,pairs){return pairs.filter(([key])=>checked(row[key])).map(([,label])=>label)}
+function areaName(v){return cleanText(v).replace(/_(?:llc|llcity)$/i,'').replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}
+function numeric(v){if(v==null||String(v).trim()==='')return null;const n=Number(v);return Number.isFinite(n)?n:null}
+function pointFor(latValue,lonValue,id){const lat=numeric(latValue),lon=numeric(lonValue);if(lat==null||lon==null||Math.abs(lat)>90||Math.abs(lon)>180)return null;let seed=(id*2654435761)>>>0;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};const jitter=()=>((random()-.5)*.008);return [Number((Math.round(lat*100)/100+jitter()).toFixed(6)),Number((Math.round(lon*100)/100+jitter()).toFixed(6))]}
+const disabilityHeaders=['Type/s of Disability:/Physical/Mobility disability','Type/s of Disability:/Visual ','Type/s of Disability:/Hearing','Type/s of Disability:/Speech/Communication','Type/s of Disability:/Intellectual/Developmental','Type/s of Disability:/Psychosocial','Type/s of Disability:/Learning','Type/s of Disability:/Chronic Illness'];
+function personSenior(row){const flag=yesNo(row['Profile or sector:/Senior citizen']),age=cleanText(row.Age).toLowerCase();return flag===true||age.includes('60 years old and older')?true:flag===false||age?false:null}
+function personPwd(row){const flag=yesNo(row['Profile or sector:/Person with Disability (PWD)']),types=disabilityHeaders.map(k=>yesNo(row[k]));if(flag===true||types.includes(true))return true;if(flag===false||types.every(x=>x===false))return false;return null}
+function combineState(values){if(values.includes(true))return true;if(values.every(v=>v===false))return false;return null}
+const basemaps={
+ streets:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',attribution:'Tiles &copy; Esri | Sources: Esri, HERE, Garmin, FAO, NOAA, USGS, EPA, NPS, OpenStreetMap contributors, and the GIS User Community'},
+ satellite:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',attribution:'Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community'},
+ topographic:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',attribution:'Tiles &copy; Esri | Sources: Esri, HERE, Garmin, Intermap, increment P, GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), OpenStreetMap contributors, and the GIS User Community'},
+ light:{url:'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',attribution:'Tiles &copy; Esri | Sources: Esri, HERE, Garmin, FAO, NOAA, USGS, EPA, NPS, and the GIS User Community'}
+};
+function setBasemap(name){if(!map)return;const source=basemaps[name]||basemaps.streets;if(basemapLayer)map.removeLayer(basemapLayer);basemapLayer=L.tileLayer(source.url,{maxZoom:19,attribution:source.attribution});basemapLayer.addTo(map)}
+function buildRecords(wb){
+ const sheets=wb.SheetNames.map(name=>({name,rows:XLSX.utils.sheet_to_json(wb.Sheets[name],{defval:null,raw:true})}));
+ const source=sheets.find(s=>s.rows.length&&['_submitted_by','Age','_Record your current location_latitude','_Record your current location_longitude'].every(k=>Object.prototype.hasOwnProperty.call(s.rows[0],k)));
+ if(!source)throw new Error('This workbook has no household master-list sheet. Choose the DRR-CCA Master List workbook.');
+ const family=sheets.find(s=>s.name.toLowerCase()==='fam_members'||s.rows[0]&&Object.prototype.hasOwnProperty.call(s.rows[0],'_parent_index'));
+ const familyByParent=new Map();if(family)family.rows.forEach(m=>{const k=String(m._parent_index??'');if(!k)return;if(!familyByParent.has(k))familyByParent.set(k,[]);familyByParent.get(k).push(m)});
+ const wallOptions=[['Walls/Concrete/ Brick/ Stone','Concrete / brick / stone'],['Walls/Wood','Wood'],['Walls/Makeshift materials','Makeshift materials']];
+ const roofOptions=[['Roof/Galvanized iron/ Aluminum','Galvanized iron / aluminum'],['Roof/Concrete','Concrete'],['Roof/Clay tiles','Clay tiles'],['Roof/Glass','Glass'],['Roof/Nipa/ Anahaw/ Cogon','Nipa / anahaw / cogon'],['Roof/Makeshift materials','Makeshift materials']];
+ const equipmentOptions=[['Emergency equipment/Fire extinguisher','Fire extinguisher'],['Emergency equipment/First aid kit','First aid kit'],['Emergency equipment/Sprinkler system','Sprinkler system'],['Emergency equipment/Smoke sensor','Smoke sensor'],['Emergency equipment/Generator','Generator'],['Emergency equipment/Emergency go bag','Emergency go bag'],['Emergency equipment/None','None listed']];
+ const hazardOptions=[['What disaster/calamity?/Fire','Fire'],['What disaster/calamity?/Flood','Flood'],['What disaster/calamity?/Typhoon','Typhoon'],['What disaster/calamity?/Earthquake','Earthquake'],['What disaster/calamity?/Landslide','Landslide'],['What disaster/calamity?/Sea-level rise/ Tsunami','Sea-Level Rise / Tsunami'],['What disaster/calamity?/Drought','Drought'],['What disaster/calamity?/storm surge','Storm Surge'],['What disaster/calamity?/Storm surge','Storm Surge']];
+ const receiveOptions=['Mobile phone (call/SMS)','Smartphone with mobile data','Social media','Landline telephone','Two-way radio/ Handheld radio','AM/FM radio','Television','Newspaper','Word of mouth','No regular means of communication'].map(v=>['Mode of communication (receiving emergency news)/'+v,v]);
+ const sendOptions=['Mobile phone','Internet connection','Landline','Satellite radio','Manual alarm system'].map(v=>['Communication devices available (sending communication)/'+v,v]);
+ const records=[];source.rows.forEach((r,index)=>{
+  const area=areaName(r._submitted_by);if(!area)return;const id=records.length+1,related=familyByParent.get(String(r._index??''))||[];
+  const headSenior=personSenior(r),headPwd=personPwd(r),seniorHH=combineState([headSenior,...related.map(personSenior)]),pwdHH=combineState([headPwd,...related.map(personPwd)]);
+  const evac=yesNo(r['Have you experienced a disaster/calamity that made you evacuate?']);
+  const gear=pickList(r,equipmentOptions),events=evac===true?pickList(r,hazardOptions).filter((v,i,a)=>a.indexOf(v)===i):[];
+  const name=[r['First Name'],r['Middle Name'],r['Last Name']].map(cleanText).filter(Boolean).join(' ');
+  records.push({id,area,p:pointFor(r['_Record your current location_latitude'],r['_Record your current location_longitude'],id),age:valueOrNull(r.Age),sex:valueOrNull(r['Sex at birth']),civil:valueOrNull(r['Civil Status']),income:valueOrNull(r['Household monthly income']),size:numeric(r['Total number of person in the household']),seniorHead:headSenior,pwdHead:headPwd,seniorHH,pwdHH,solo:yesNo(r['Profile or sector:/Solo parent']),fisher:yesNo(r['Profile or sector:/Fisherfolk']),pregnant:yesNo(r['Profile or sector:/Pregnant/Lactating mother']),walls:pickList(r,wallOptions),roof:pickList(r,roofOptions),dwelling:valueOrNull(r['Type of dwelling unit']),access:valueOrNull(r['How can the household be accessed from the barangay road?']),foundation:yesNo(r['Presence of foundation/column']),toilet:yesNo(r['Presence of sanitary toilet facility']),septic:yesNo(r['Presence of septic tank']),fireExit:yesNo(r['Presence of fire exit']),electricity:yesNo(r['Is there power/ electricity in the household?']),warning:yesNo(r['Presence of community early-warning system']),training:yesNo(r['Have you joined any emergency preparedness trainings?']),evacCenter:yesNo(r['Do you know the nearest evacuation center/s?']),evacuated:evac,hotline:yesNo(r['Do you know the local hotline for emergency?']),noEquipment:checked(r['Emergency equipment/None']),equipment:gear,hazards:events,receive:pickList(r,receiveOptions),send:pickList(r,sendOptions),headName:name||null,headPhone:valueOrNull(r['Contact Number']),education:valueOrNull(r['Educational Attainment']),laborForce:valueOrNull(r['Member of the labor force:'])});
+ });
+ if(!records.length)throw new Error('No household records with submission-area tags were found in this workbook.');return records;
+}
+function refreshDataIndexes(){allAreaCounts=new Map();D.forEach(r=>allAreaCounts.set(r.area,(allAreaCounts.get(r.area)||0)+1));areas=[...allAreaCounts.keys()].sort((a,b)=>a.localeCompare(b));ages=[...new Set(D.map(r=>r.age).filter(Boolean))].sort((a,b)=>a.localeCompare(b));selectedAreas=new Set(areas);ageFilter='All';$('age-filter').value='All';renderAreas();renderAgeOptions()}
+async function loadWorkbook(file){if(!file)return;if(!window.XLSX){$('file-status').textContent='The Excel reader did not load. Connect to the internet, then reload this page.';$('file-status').classList.add('error');return}$('file-status').classList.remove('error');$('file-status').textContent='Reading workbook locally…';try{const workbook=XLSX.read(await file.arrayBuffer(),{type:'array'}),records=buildRecords(workbook);D=records;refreshDataIndexes();activeFilter=null;mapSelected=null;highlighted=null;page=0;showHeadContact=false;$('show-head-contact').checked=false;$('dataset-count').textContent=fmt(D.length)+' household records';$('file-status').textContent='Loaded '+file.name+' · '+fmt(D.length)+' households · '+areas.length+' submission areas';$('data-notes').textContent='Workbook data is read locally in this browser session; it is not uploaded and household-head names or contact numbers are not embedded in this HTML file. The dashboard does not retain original coordinates: map points use rounded coordinate cells with synthetic offsets. Area labels come from submission tags and should be verified before official geographic comparisons. Roster indicators are unknown where source answers are incomplete.';renderAll(true)}catch(error){$('file-status').textContent=error&&error.message?error.message:'Could not read this workbook.';$('file-status').classList.add('error')}}
+function rowFilter(r){
+ if(!activeFilter)return true;
+ const k=activeFilter.key,v=activeFilter.value;
+ if(k==='area')return r.area===v;
+ if(k==='areaGap'){const a=v.split('~'),g=a[1];return r.area===a[0]&&(g==='noEquipment'?r.noEquipment===true:r[g]===false)}
+ if(k==='gap')return v==='noEquipment'?r.noEquipment===true:r[v]===false;
+ if(k==='knowledge')return r[v]===true;
+ if(k==='profile')return r[v]===true;
+ if(k==='evacuation')return r.evacuated===(v==='Yes');
+ if(k==='condition')return r[v]===false;
+ if(k==='hazards')return r.evacuated===true&&(r.hazards||[]).includes(v);
+ if(k==='hazardCombo'){const target=v.split('|').sort(),actual=(r.hazards||[]).slice().sort();return r.evacuated===true&&actual.join('|')===target.join('|')}
+ if(k==='size')return String(r.size)===String(v);
+ if(k==='walls'||k==='roof'||k==='equipment'||k==='receive'||k==='send')return (r[k]||[]).includes(v);
+ return String(r[k])===String(v);
+}
+function baseRows(){return D.filter(r=>selectedAreas.has(r.area)&&(ageFilter==='All'||r.age===ageFilter))}
+function mapRows(){return baseRows().filter(rowFilter)}
+function tableRows(){const rs=mapRows();return mapSelected==null?rs:rs.filter(r=>r.id===mapSelected)}
+function known(rows,k){return rows.filter(r=>r[k]!==null&&r[k]!==undefined)}
+function gapN(rows,k){return k==='noEquipment'?rows.filter(r=>r.noEquipment===true).length:rows.filter(r=>r[k]===false).length}
+function renderAreas(){
+ const host=$('area-options');host.innerHTML='';
+ if(!areas.length){host.innerHTML='<span class="area-count">Load a workbook to see submission areas.</span>';return}
+ areas.forEach(a=>{const lab=document.createElement('label');lab.className='area-option';const cb=document.createElement('input');cb.type='checkbox';cb.value=a;cb.checked=selectedAreas.has(a);cb.setAttribute('aria-label',a+' submission-area proxy');cb.addEventListener('change',()=>{if(cb.checked)selectedAreas.add(a);else selectedAreas.delete(a);filtersChanged()});lab.append(cb,document.createTextNode(a));const n=document.createElement('span');n.className='area-count';n.textContent=fmt(allAreaCounts.get(a));lab.append(n);host.append(lab)});
+}
+function renderAgeOptions(){const s=$('age-filter');s.innerHTML='<option value="All">All age groups</option>';ages.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;s.append(o)});s.value=ageFilter}
+function metric(label,value,note){return '<article class="metric"><div class="metric-label">'+esc(label)+'</div><div class="metric-value">'+esc(value)+'</div><div class="metric-note">'+esc(note)+'</div></article>'}
+function renderMetrics(rows){
+ let out=metric('Households in selected areas',fmt(rows.length),'Area and age filters applied');
+ gapDefs.forEach(g=>{const den=known(rows,g.key);const n=gapN(rows,g.key);out+=metric(g.label,fmt(n),pct(n,den.length)+' of '+fmt(den.length)+' known responses')});
+  const laborRows=rows.filter(r=>r.laborForce),unemployed=laborRows.filter(r=>r.laborForce==='Unemployed').length;
+ const ageRows=rows.filter(r=>r.age),older=ageRows.filter(r=>r.age==='60 years old and older').length;
+  out+=metric('Unemployed household heads',fmt(unemployed),pct(unemployed,laborRows.length)+' of '+fmt(laborRows.length)+' with labor-force status reported');
+ out+=metric('Household heads aged 60+',fmt(older),pct(older,ageRows.length)+' of '+fmt(ageRows.length)+' with age reported');
+ $('metrics').innerHTML=out;
+}
+function entry(label,key,value,test,rows,denRows){
+ const n=rows.filter(test).length,den=denRows.length;
+ return {label,key,value,count:n,den:den};
+}
+function simpleEntries(rows,field,key,order){
+ const vals=new Map();rows.forEach(r=>{const v=r[field];if(v!==null&&v!==undefined&&v!=='')vals.set(String(v),(vals.get(String(v))||0)+1)});
+ let list=[...vals.keys()];list.sort(order==='alpha'?(a,b)=>a.localeCompare(b,undefined,{numeric:true}):(a,b)=>vals.get(b)-vals.get(a));
+ const den=rows.filter(r=>r[field]!==null&&r[field]!==undefined&&r[field]!=='');
+ return list.map(v=>entry(v,key,v,r=>String(r[field])===v,rows,den));
+}
+function listEntries(rows,field,key){
+ const vals=new Set();rows.forEach(r=>(r[field]||[]).forEach(v=>vals.add(v)));
+ const list=[...vals].sort((a,b)=>rows.filter(r=>(r[field]||[]).includes(b)).length-rows.filter(r=>(r[field]||[]).includes(a)).length);
+ return list.map(v=>entry(v,key,v,r=>(r[field]||[]).includes(v),rows,rows));
+}
+function addGroup(host,title,note){
+ const g=document.createElement('section');g.className='chart-group';g.innerHTML='<div class="group-heading"><h3>'+esc(title)+'</h3><span>'+esc(note||'')+'</span></div><div></div>';host.append(g);return g.lastElementChild;
+}
+function barCard(host,title,note,items,tone,foot){
+ const c=document.createElement('article');c.className='chart-card '+(tone||'');c.innerHTML='<h4 class="chart-title">'+esc(title)+'</h4><p class="chart-sub">'+esc(note||'Click a bar to filter the map and table.')+'</p>';
+ const bars=document.createElement('div');bars.className='chart-bars';
+ if(!items.length)bars.innerHTML='<div class="chart-empty">No responses in the current filter.</div>';
+ const max=Math.max(1,...items.map(x=>x.count));
+ items.forEach(x=>{const b=document.createElement('button');b.type='button';b.className='chart-bar';b.dataset.key=x.key;b.dataset.value=String(x.value);b.setAttribute('aria-pressed',String(!!(activeFilter&&activeFilter.key===x.key&&String(activeFilter.value)===String(x.value))));if(activeFilter&&activeFilter.key===x.key&&String(activeFilter.value)===String(x.value))b.classList.add('is-active');
+  b.setAttribute('aria-label',x.label+': '+fmt(x.count)+' households, '+pct(x.count,x.den));
+  const lab=document.createElement('span');lab.className='bar-label';lab.textContent=x.label;
+  const track=document.createElement('span');track.className='bar-track';const fill=document.createElement('i');fill.className='bar-fill';fill.style.width=(x.count?Math.max(1,x.count/max*100):0)+'%';track.append(fill);
+  const stat=document.createElement('span');stat.className='bar-stat';stat.innerHTML='<strong>'+fmt(x.count)+'</strong><small>'+pct(x.count,x.den)+'</small>';
+  b.append(lab,track,stat);bars.append(b)
+ });
+ c.append(bars);if(foot){const f=document.createElement('p');f.className='chart-foot';f.textContent=foot;c.append(f)}host.append(c);
+}
+function heatmap(host,rows){
+ const c=document.createElement('article');c.className='chart-card warm';c.innerHTML='<h4 class="chart-title">Preparedness gaps by submission area</h4><p class="chart-sub">Percent of known responses. Click a cell to filter that area and gap.</p>';
+ const grid=document.createElement('div');grid.className='heatmap';const empty=document.createElement('span');empty.className='heat-head';empty.textContent='Area proxy';grid.append(empty);
+ gapDefs.forEach(g=>{const h=document.createElement('span');h.className='heat-head';h.textContent=g.short;grid.append(h)});
+ const activeAreas=areas.filter(a=>selectedAreas.has(a));
+ activeAreas.forEach(a=>{const rs=rows.filter(r=>r.area===a);const label=document.createElement('span');label.className='heat-area';label.textContent=a;grid.append(label);
+ gapDefs.forEach(g=>{const eligible=known(rs,g.key);const n=gapN(rs,g.key);const p=eligible.length?n/eligible.length:0;const b=document.createElement('button');b.type='button';b.className='heat-cell';b.dataset.key='areaGap';b.dataset.value=a+'~'+g.key;b.style.backgroundColor='rgba(201,86,78,'+(0.08+Math.min(.62,p*.75))+')';b.setAttribute('aria-label',a+': '+g.label+', '+n+' of '+eligible.length+', '+pct(n,eligible.length));b.setAttribute('aria-pressed',String(!!(activeFilter&&activeFilter.key==='areaGap'&&activeFilter.value===b.dataset.value)));if(activeFilter&&activeFilter.key==='areaGap'&&activeFilter.value===b.dataset.value)b.classList.add('is-active');b.innerHTML='<strong>'+pct(n,eligible.length)+'</strong><small>'+fmt(n)+' / '+fmt(eligible.length)+'</small>';grid.append(b)})
+ });
+ if(!activeAreas.length)grid.innerHTML='<span class="chart-empty">Select one or more areas to compare gaps.</span>';c.append(grid);host.append(c);
+}
+const SVG='http://www.w3.org/2000/svg';
+function svgEl(tag,attrs,text){
+ const e=document.createElementNS(SVG,tag);
+ Object.keys(attrs||{}).forEach(k=>e.setAttribute(k,attrs[k]));
+ if(text!==undefined)e.textContent=text;
+ return e
+}
+function renderUpSet(host,rows){
+ const order=['Typhoon','Earthquake','Fire','Storm Surge','Flood','Sea-level rise/ Tsunami','Landslide','Drought'];
+ const evac=rows.filter(r=>r.evacuated===true),totals=order.map(h=>evac.filter(r=>(r.hazards||[]).includes(h)).length);
+ const combos=new Map();
+ evac.forEach(r=>{const set=order.filter(h=>(r.hazards||[]).includes(h));if(!set.length)return;const k=set.join('|');combos.set(k,(combos.get(k)||0)+1)});
+ const top=[...combos.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).slice(0,14);
+ const card=document.createElement('article');card.className='chart-card warm';
+ card.innerHTML='<h4 class="chart-title">Disaster experience by household</h4><p class="chart-sub">UpSet view of disaster combinations among respondents who reported evacuation. Click a column or event total to filter.</p>';
+ if(!top.length){card.insertAdjacentHTML('beforeend','<div class="chart-empty">No disaster-category combinations in the current filter.</div>');host.append(card);return}
+ const wrap=document.createElement('div');wrap.className='upset-wrap';
+ const rowH=22,topH=118,matrixY=topH+12,leftW=226,colW=37,width=leftW+top.length*colW+8,height=matrixY+order.length*rowH+14;
+ const svg=svgEl('svg',{viewBox:'0 0 '+width+' '+height,width:width,height:height,role:'img','aria-label':'Household counts by disaster experience combination'});
+ svg.append(svgEl('text',{x:4,y:14,class:'upset-axis'},'Intersection size'));
+ svg.append(svgEl('text',{x:4,y:matrixY-8,class:'upset-axis'},'Households per disaster'));
+ const maxCombo=Math.max(...top.map(x=>x[1]),1),maxTotal=Math.max(...totals,1),baseY=topH;
+ for(let i=0;i<order.length;i++){
+  const y=matrixY+i*rowH;
+  if(i%2===0)svg.append(svgEl('rect',{x:0,y:y-13,width:width,height:rowH,fill:'#f7f9f8'}));
+  const barW=82*totals[i]/maxTotal;
+  const totalGroup=svgEl('g',{'data-key':'hazards','data-value':order[i],tabindex:'0',role:'button','aria-label':order[i]+': '+totals[i]+' households'});
+  totalGroup.append(svgEl('rect',{x:3,y:y-7,width:Math.max(1,barW),height:10,rx:3,fill:'#8d9b99'}));
+  totalGroup.append(svgEl('text',{x:90,y:y+1,class:'upset-count'},String(totals[i])));
+  totalGroup.append(svgEl('text',{x:218,y:y+1,class:'upset-row-label','text-anchor':'end'},order[i]));
+  svg.append(totalGroup);
+ }
+ top.forEach((item,i)=>{
+  const parts=item[0].split('|'),x=leftW+i*colW+10,barH=88*item[1]/maxCombo;
+  const group=svgEl('g',{'data-key':'hazardCombo','data-value':item[0],tabindex:'0',role:'button','aria-label':parts.join(' + ')+': '+item[1]+' households'});
+  if(activeFilter&&activeFilter.key==='hazardCombo'&&activeFilter.value===item[0])group.classList.add('is-active');
+  group.append(svgEl('rect',{x:x-6,y:baseY-barH,width:18,height:barH,rx:2,fill:activeFilter&&activeFilter.key==='hazardCombo'&&activeFilter.value===item[0]?'#173448':'#c9564e'}));
+  group.append(svgEl('text',{x:x+3,y:baseY-barH-4,class:'upset-count','text-anchor':'middle'},String(item[1])));
+  const activeYs=parts.map(p=>order.indexOf(p)).filter(k=>k>=0).map(k=>matrixY+k*rowH-2);
+  if(activeYs.length>1)group.append(svgEl('line',{x1:x+3,y1:Math.min(...activeYs),x2:x+3,y2:Math.max(...activeYs),stroke:'#c9564e','stroke-width':2}));
+  order.forEach((h,j)=>group.append(svgEl('circle',{cx:x+3,cy:matrixY+j*rowH-2,r:parts.includes(h)?4:3,fill:parts.includes(h)?'#c9564e':'#d8e0de'})));
+  svg.append(group)
+ });
+ wrap.append(svg);card.append(wrap);
+ const note=document.createElement('p');note.className='chart-foot';note.textContent=fmt(evac.length)+' households reported evacuation; combinations with no selected event are omitted. The left bars show event totals and may overlap.';card.append(note);host.append(card)
+}
+function renderPolar(host,rows){
+ const hazards=['Typhoon','Earthquake','Fire','Storm Surge','Flood','Sea-level rise/ Tsunami','Landslide','Drought'];
+ const equipment=['First aid kit','Fire extinguisher','Emergency go bag','Generator','Smoke sensor','Sprinkler system'];
+ const items=hazards.map(label=>({label,key:'hazards',value:label,kind:'hazard',n:rows.filter(r=>r.evacuated===true&&(r.hazards||[]).includes(label)).length}))
+  .concat(equipment.map(label=>({label,key:'equipment',value:label,kind:'equipment',n:rows.filter(r=>(r.equipment||[]).includes(label)).length})));
+ const card=document.createElement('article');card.className='chart-card';
+ card.innerHTML='<h4 class="chart-title">Disaster experience vs. preparedness</h4><p class="chart-sub">Household share for each reported disaster type and equipment item. Same current-filtered household denominator.</p>';
+  const ns=document.createElement('div');ns.className='polar-wrap';const svg=svgEl('svg',{viewBox:'0 0 470 440',role:'img','aria-label':'Polar comparison of disaster experience and emergency equipment prevalence'});
+  const cx=235,cy=218,r0=32,rMax=132,scaleMax=.7,step=360/items.length,barAngle=step*.68;
+ function pt(radius,deg){const a=(deg-90)*Math.PI/180;return [cx+radius*Math.cos(a),cy+radius*Math.sin(a)]}
+ [0.2,0.4,0.6].forEach(v=>{const rr=r0+(v/scaleMax)*(rMax-r0);svg.append(svgEl('circle',{cx:cx,cy:cy,r:rr,fill:'none',stroke:'#e2e8e6','stroke-width':1}));svg.append(svgEl('text',{x:cx+4,y:cy-rr+11,class:'polar-ring'},Math.round(v*100)+'%'))});
+ items.forEach((item,i)=>{
+  const angle=i*step,center=pt(rMax,angle),p=rows.length?item.n/rows.length:0,outer=r0+Math.min(1,p/scaleMax)*(rMax-r0),a0=angle-barAngle/2,a1=angle+barAngle/2;
+  const p1=pt(r0,a0),p2=pt(outer,a0),p3=pt(outer,a1),p4=pt(r0,a1),large=(a1-a0)>180?1:0;
+  svg.append(svgEl('line',{x1:cx,y1:cy,x2:center[0],y2:center[1],stroke:'#cfd9d6','stroke-width':1,'stroke-dasharray':'3 4'}));
+  const d='M '+p1[0]+' '+p1[1]+' L '+p2[0]+' '+p2[1]+' A '+outer+' '+outer+' 0 '+large+' 1 '+p3[0]+' '+p3[1]+' L '+p4[0]+' '+p4[1]+' A '+r0+' '+r0+' 0 '+large+' 0 '+p1[0]+' '+p1[1]+' Z';
+  const g=svgEl('g',{'data-key':item.key,'data-value':item.value,tabindex:'0',role:'button','aria-label':item.label+': '+pct(item.n,rows.length)+' of '+rows.length+' households'});
+  g.classList.add('polar-sector');g.append(svgEl('path',{d:d,fill:item.kind==='hazard'?'#e84b3c':'#2fc477',opacity:.92,stroke:'#fff','stroke-width':1}));
+  const labelPt=pt(rMax+31,angle),anchor=labelPt[0]<cx-20?'end':labelPt[0]>cx+20?'start':'middle';
+  g.append(svgEl('text',{x:labelPt[0],y:labelPt[1]+3,class:'polar-label','text-anchor':anchor},item.label));
+  g.append(svgEl('title',{},item.label+': '+fmt(item.n)+' households ('+pct(item.n,rows.length)+')'));
+  svg.append(g)
+ });
+ svg.append(svgEl('circle',{cx:cx,cy:cy,r:2.5,fill:'#466273'}));
+ ns.append(svg);card.append(ns);
+ const legend=document.createElement('div');legend.className='polar-legend';legend.innerHTML='<span><i class="legend-dot disaster"></i>Disaster experience</span><span><i class="legend-dot equipment"></i>Emergency equipment</span>';card.append(legend);
+ const note=document.createElement('p');note.className='chart-foot';note.textContent='Event selections are recorded for households reporting evacuation. Equipment and disaster categories can overlap. Click a sector or label to filter matching records.';card.append(note);host.append(card)
+}
+function renderCharts(rows){
+ const host=$('chart-content');host.innerHTML='';
+  if(!D.length){host.innerHTML='<article class="chart-card"><h4 class="chart-title">Choose a workbook to build the dashboard</h4><p class="chart-sub">Select the DRR-CCA Master List above. Charts and map points will be generated from that file in this browser.</p></article>';return}
+  if(!rows.length){host.innerHTML='<article class="chart-card"><h4 class="chart-title">No households in the current selection</h4><p class="chart-sub">Select one or more submission areas above to show charts and points.</p></article>';return}
+ let g=addGroup(host,'1 · Where are the needs?','Coverage and gaps');
+ barCard(g,'Survey coverage by submission area','Household records by submission-area proxy.',simpleEntries(rows,'area','area'),'blue');
+ heatmap(g,rows);
+ g=addGroup(host,'2 · What are the preparedness gaps?','Warning, training, equipment, and knowledge');
+ const gaps=gapDefs.map(x=>{const eligible=known(rows,x.key);return entry(x.label,'gap',x.key,r=>x.key==='noEquipment'?r.noEquipment===true:r[x.key]===false,rows,eligible)});
+ barCard(g,'Preparedness gaps','Share of households reporting each gap.',gaps,'warm','Indicators overlap and should not be added together.');
+ barCard(g,'Emergency equipment reported','Households selecting each equipment option.',listEntries(rows,'equipment','equipment'),'green','“None listed” appears when selected. Multiple items may be reported.');
+ barCard(g,'Access from the barangay road','Reported vehicle access to the household.',simpleEntries(rows,'access','access'),'blue');
+ g=addGroup(host,'3 · Which households may need additional support?','Profile, income, size, housing');
+ barCard(g,'Household-head age group','Age group reported for the respondent / household head.',simpleEntries(rows,'age','age'),'purple');
+ barCard(g,'Sex at birth','Reported household-head profile.',simpleEntries(rows,'sex','sex'),'purple');
+ barCard(g,'Civil status','Reported household-head profile.',simpleEntries(rows,'civil','civil'),'purple');
+  barCard(g,'Household-head educational attainment','Highest educational attainment reported for the household head.',simpleEntries(rows,'education','education'),'purple');
+  barCard(g,'Household-head labor-force status','Reported as formal, informal, or unemployed.',simpleEntries(rows,'laborForce','laborForce'),'purple');
+ const pdefs=[['Older adult in household','seniorHH'],['Person with disability in household','pwdHH'],['Older adult is the respondent / head','seniorHead'],['PWD is the respondent / head','pwdHead'],['Solo parent profile','solo'],['Fisherfolk profile','fisher'],['Pregnant / lactating profile','pregnant']];
+ const profiles=pdefs.map(x=>{const eligible=known(rows,x[1]);return entry(x[0],'profile',x[1],r=>r[x[1]]===true,rows,eligible)});
+ barCard(g,'Older-person and PWD indicators','Household indicators include respondent and listed family members.',profiles,'purple','Unanswered or incomplete roster indicators are excluded from their denominators.');
+ barCard(g,'Household monthly income','Reported household income bands.',simpleEntries(rows,'income','income'),'teal');
+ barCard(g,'Household size','Reported number of people in the household.',simpleEntries(rows.filter(r=>r.size!==null),'size','size','alpha'),'gold');
+ barCard(g,'Wall materials','Multi-select wall materials.',listEntries(rows,'walls','walls'),'gold','A household may appear in more than one material bar.');
+ barCard(g,'Roof materials','Multi-select roof materials.',listEntries(rows,'roof','roof'),'gold','A household may appear in more than one material bar.');
+ barCard(g,'Dwelling type','Reported household dwelling type.',simpleEntries(rows,'dwelling','dwelling'),'gold');
+ const conds=[['Foundation / column not reported','foundation'],['Sanitary toilet not reported','toilet'],['Septic tank not reported','septic'],['Fire exit not reported','fireExit'],['Electricity not reported','electricity']];
+ barCard(g,'Housing conditions and basic services','Share answering “No” for each condition.',conds.map(x=>{const eligible=known(rows,x[1]);return entry(x[0],'condition',x[1],r=>r[x[1]]===false,rows,eligible)}),'warm');
+ g=addGroup(host,'4 · What disaster experiences and information gaps matter?','Experience and communication');
+ renderUpSet(g,rows);
+ renderPolar(g,rows);
+ const evacKnown=known(rows,'evacuated');
+ barCard(g,'Disaster experience involving evacuation','Reported yes / no answer.',[
+  entry('Yes','evacuation','Yes',r=>r.evacuated===true,rows,evacKnown),entry('No','evacuation','No',r=>r.evacuated===false,rows,evacKnown)
+ ],'warm');
+ const hs=new Set();rows.forEach(r=>{if(r.evacuated===true)(r.hazards||[]).forEach(h=>hs.add(h))});
+ const hazards=[...hs].map(h=>entry(h,'hazards',h,r=>r.evacuated===true&&(r.hazards||[]).includes(h),rows,rows.filter(r=>r.evacuated===true)));
+ barCard(g,'Disaster experience categories','Selected events among households reporting evacuation; selections may overlap.',hazards,'warm');
+ const kdefs=[['Knows nearest evacuation center','evacCenter'],['Knows local emergency hotline','hotline'],['Joined emergency preparedness training','training'],['Community early-warning system reported','warning']];
+ barCard(g,'Preparedness knowledge and participation','Households answering “Yes.”',kdefs.map(x=>{const eligible=known(rows,x[1]);return entry(x[0],'knowledge',x[1],r=>r[x[1]]===true,rows,eligible)}),'green');
+ barCard(g,'Emergency news channels received','Multi-select channels reported by households.',listEntries(rows,'receive','receive'),'blue');
+ barCard(g,'Communication devices available to send','Devices and connection types reported by households.',listEntries(rows,'send','send'),'blue','These are reported devices, not a measure of service reliability.');
+}
+function selectionLabel(){
+ if(mapSelected!=null){const r=D.find(x=>x.id===mapSelected);return r?rowName(r)+' selected from map · '+r.area+' area proxy':'One map record selected'}
+ return activeFilter?'Chart selection: '+activeFilter.label:'All households matching area and age filters'
+}
+function renderBanner(){const b=$('selection-banner');if(activeFilter||mapSelected!=null){const n=tableRows().length;b.classList.add('show');b.textContent=selectionLabel()+' · '+fmt(n)+' matching household row'+(n===1?'':'s')+'.'}else{b.classList.remove('show');b.textContent=''}}
+function renderTable(){
+ const rows=tableRows(),body=$('table-body'),total=rows.length,pages=Math.max(1,Math.ceil(total/5));page=Math.min(page,pages-1);body.innerHTML='';
+ $('table-count').textContent=total?'Showing '+(page*5+1)+'–'+Math.min(page*5+5,total)+' of '+fmt(total)+' rows · page '+(page+1)+' of '+pages:'No matching rows';
+ $('prev-page').disabled=page===0;$('next-page').disabled=page>=pages-1;
+  document.querySelectorAll('[data-private-column]').forEach(th=>{th.hidden=!showHeadContact});
+  const visible=rows.slice(page*5,page*5+5);if(!visible.length){body.innerHTML='<tr><td class="table-empty" colspan="'+(showHeadContact?12:10)+'">No household records match the current selection.</td></tr>';renderBanner();return}
+ visible.forEach(r=>{
+  const support=[];if(r.seniorHH===true)support.push('Older adult');if(r.pwdHH===true)support.push('PWD');if(!support.length&&(r.seniorHH===false||r.pwdHH===false))support.push('None flagged');if(!support.length)support.push('Unknown');
+  const gaps=gapDefs.filter(g=>g.key==='noEquipment'?r.noEquipment===true:r[g.key]===false).map(g=>g.short);
+  const housing=[...(r.walls||[]).map(x=>'Wall: '+x),...(r.roof||[]).map(x=>'Roof: '+x)];
+  const disaster=r.evacuated===true?(r.hazards.length?'Evacuated · '+r.hazards.join(', '):'Evacuated · event unspecified'):r.evacuated===false?'No evacuation reported':'Not reported';
+   const cells=[rowName(r),r.area,[r.age,r.sex,r.civil,r.education].filter(Boolean).join(' · ')||'Not reported',r.income||'Not reported',r.size==null?'Not reported':String(r.size),support.join(', '),gaps.join('; ')||'No listed gap / unknown',housing.join('; ')||'Not reported',disaster,(r.receive||[]).join(', ')||'Not reported'];
+   if(showHeadContact)cells.splice(1,0,r.headName||'Not reported',r.headPhone||'Not reported');
+  const tr=document.createElement('tr');tr.dataset.id=String(r.id);if(mapSelected===r.id||highlighted===r.id)tr.classList.add('is-selected');
+   cells.forEach((v,i)=>{const td=document.createElement('td');if(i===0)td.className='record-id';if(i===(showHeadContact?8:6)&&gaps.length)td.innerHTML=gaps.map(x=>'<span class="badge">'+esc(x)+'</span>').join('');else td.textContent=v;tr.append(td)});
+  tr.addEventListener('click',()=>{highlighted=r.id;if(map&&r.p)map.setView(r.p,Math.max(map.getZoom(),16),{animate:true});updateMarkers();renderTable()});body.append(tr);
+ });
+ renderBanner();
+}
+function pointIcon(selected,filtered){
+ const cls='house-dot'+(filtered?' filtered':'')+(selected?' selected':'');
+ const size=selected?14:10;
+ return L.divIcon({className:cls,html:'',iconSize:[size,size],iconAnchor:[size/2,size/2]})
+}
+function renderMap(fit){
+ if(!map||!clusters)return;
+ clusters.clearLayers();markerById.clear();const rows=mapRows();let mapped=0;
+ rows.forEach(r=>{if(!r.p)return;mapped++;const selected=mapSelected===r.id||highlighted===r.id;
+  const marker=L.marker(r.p,{icon:pointIcon(selected,!!activeFilter)});
+  marker.bindPopup('<strong>'+rowName(r)+'</strong><br>'+esc(r.area)+' submission-area proxy<br><span style="color:#607783">Approximate, displaced location</span>');
+  marker.on('click',()=>{mapSelected=r.id;highlighted=r.id;page=0;renderTable();updateMarkers()});
+  markerById.set(r.id,marker);clusters.addLayer(marker)
+ });
+ const loading=$('map').querySelector('.map-loading');if(loading)loading.remove();
+ $('map-count').innerHTML='<strong>'+fmt(mapped)+' approximate points</strong> from '+fmt(rows.length)+' matching records · '+fmt(rows.length-mapped)+' without valid coordinates';
+ $('map-filter-label').textContent=selectionLabel();
+ if(fit&&mapped){const pts=rows.filter(r=>r.p).map(r=>r.p);const bounds=L.latLngBounds(pts);map.fitBounds(bounds.pad(.07),{maxZoom:15});firstView=false}
+}
+function updateMarkers(){
+ markerById.forEach((m,id)=>m.setIcon(pointIcon(id===mapSelected||id===highlighted,!!activeFilter)));
+ $('map-filter-label').textContent=selectionLabel()
+}
+function renderAll(fit){
+ const rows=baseRows();renderMetrics(rows);renderCharts(rows);renderTable();renderMap(fit)
+}
+function filtersChanged(){activeFilter=null;mapSelected=null;highlighted=null;page=0;renderAreas();renderAll(true)}
+function setChartFilter(key,value,label){
+ if(activeFilter&&activeFilter.key===key&&String(activeFilter.value)===String(value)){activeFilter=null}
+ else activeFilter={key:key,value:value,label:label};
+ mapSelected=null;highlighted=null;page=0;renderCharts(baseRows());renderTable();renderMap(true)
+}
+function clickChart(key,value){
+ if(key==='area')return setChartFilter(key,value,'Area proxy: '+value);
+ if(key==='areaGap'){const parts=value.split('~'),g=gapDefs.find(x=>x.key===parts[1]);return setChartFilter(key,value,parts[0]+' · '+(g?g.label:parts[1]))}
+ if(key==='gap'){const g=gapDefs.find(x=>x.key===value);return setChartFilter(key,value,g?g.label:value)}
+ if(key==='evacuation')return setChartFilter(key,value,'Evacuation experience: '+value.toLowerCase());
+ if(key==='hazards')return setChartFilter(key,value,'Evacuation experience · '+value);
+  if(key==='hazardCombo')return setChartFilter(key,value,'Disaster combination · '+value.split('|').join(' + '));
+  if(key==='education')return setChartFilter(key,value,'Household-head education · '+value);
+  if(key==='laborForce')return setChartFilter(key,value,'Household-head labor-force status · '+value);
+ if(key==='knowledge'){const labels={evacCenter:'Knows nearest evacuation center',hotline:'Knows local emergency hotline',training:'Joined emergency preparedness training',warning:'Community early-warning system reported'};return setChartFilter(key,value,labels[value]||value)}
+ if(key==='profile'){const labels={seniorHH:'Older adult in household',pwdHH:'Person with disability in household',seniorHead:'Older adult is respondent / head',pwdHead:'PWD is respondent / head',solo:'Solo parent profile',fisher:'Fisherfolk profile',pregnant:'Pregnant / lactating profile'};return setChartFilter(key,value,labels[value]||value)}
+  const title={walls:'Wall material',roof:'Roof material',equipment:'Emergency equipment',receive:'Emergency news channel',send:'Communication device',size:'Household size',condition:'Housing condition'}[key]||key;
+ setChartFilter(key,value,title+': '+value)
+}
+function initMap(){
+ if(!window.L){$('map').innerHTML='<div class="map-loading">Map libraries did not load. Charts and the table are still available.</div>';return}
+   map=L.map('map',{preferCanvas:true}).setView([10.31,123.97],13);setBasemap($('basemap-select').value);
+ clusters=L.markerClusterGroup?L.markerClusterGroup({showCoverageOnHover:false,spiderfyOnMaxZoom:true,maxClusterRadius:38,chunkedLoading:true}):L.layerGroup();clusters.addTo(map);renderMap(true);setTimeout(()=>map.invalidateSize(),150)
+}
+$('select-all').addEventListener('click',()=>{selectedAreas=new Set(areas);filtersChanged()});
+$('clear-areas').addEventListener('click',()=>{selectedAreas.clear();filtersChanged()});
+$('reset-filters').addEventListener('click',()=>{selectedAreas=new Set(areas);ageFilter='All';$('age-filter').value='All';filtersChanged()});
+$('age-filter').addEventListener('change',e=>{ageFilter=e.target.value;filtersChanged()});
+ $('basemap-select').addEventListener('change',e=>setBasemap(e.currentTarget.value));
+ const explorer=$('explorer');
+  $('chart-height-slider').addEventListener('input',e=>{const value=Number(e.currentTarget.value);explorer.style.setProperty('--chart-height',value+'px');$('chart-height-value').textContent=value+' px'});
+  $('chart-width-slider').addEventListener('input',e=>{const value=Number(e.currentTarget.value);explorer.style.setProperty('--chart-width',value+'%');$('chart-width-value').textContent=value+'%';if(map)requestAnimationFrame(()=>map.invalidateSize())});
+ $('workbook-file').addEventListener('change',e=>loadWorkbook(e.currentTarget.files&&e.currentTarget.files[0]));
+ $('show-head-contact').addEventListener('change',e=>{showHeadContact=e.currentTarget.checked;renderTable()});
+$('clear-selection').addEventListener('click',()=>{activeFilter=null;mapSelected=null;highlighted=null;page=0;renderAll(true)});
+ $('chart-content').addEventListener('click',e=>{const b=e.target.closest('[data-key]');if(b)clickChart(b.dataset.key,b.dataset.value)});
+ $('chart-content').addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const b=e.target.closest('[data-key]');if(b){e.preventDefault();clickChart(b.dataset.key,b.dataset.value)}});
+$('prev-page').addEventListener('click',()=>{if(page>0){page--;renderTable()}});
+$('next-page').addEventListener('click',()=>{if(page<Math.ceil(tableRows().length/5)-1){page++;renderTable()}});
+ $('data-notes').textContent='Choose the household master-list workbook above. Its rows are read locally in this browser session to generate the dashboard; workbook contents are not uploaded or embedded into this HTML file.';
+ renderAreas();renderAgeOptions();renderAll(false);initMap();
+})();
+</script>
+</body>
+</html>
